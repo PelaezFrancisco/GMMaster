@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "Application.h"
 
 
 //Window callback
@@ -21,12 +22,19 @@ void init_glfw() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 //Triangel vertices
-float * triangle_vertices() {
+float triangle_vertices() {
     
-    float vertices[9] = {
+    float vertices[] = {
     -0.5f, -0.5f, 0.0f,
      0.5f, -0.5f, 0.0f,
      0.0f,  0.5f, 0.0f
     };
-    return vertices;
+    /*
+   * float vert[] = {
+       -0.5f, -0.5f, 0.0f, // left
+        0.5f, -0.5f, 0.0f, // right
+        0.0f,  0.5f, 0.0f  // top
+   };
+   */
+    return *vertices;
 }

@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\glad.c" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Display.cpp" />
     <ClCompile Include="src\Draw.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
