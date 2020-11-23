@@ -1,2 +1,5 @@
-﻿  Display.cpp
+﻿  Application.cpp
+  Display.cpp
+D:\Personal\Codes\OpenGL\ProyectZ\ProyectZ\ProyectZ\src\Display.cpp(92,34): warning C4101: 'EBO': unreferenced local variable
+  Generating Code...
   ProyectZ.vcxproj -> D:\Personal\Codes\OpenGL\ProyectZ\ProyectZ\x64\Debug\ProyectZ.exe

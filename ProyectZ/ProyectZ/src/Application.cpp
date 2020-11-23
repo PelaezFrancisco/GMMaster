@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "Application.h"
+#include "Display.h"
 
 using namespace std;
 
@@ -30,7 +31,7 @@ int main()
         return -1;
     }
    
-    prep_vertex(); // Initialize vertex values
+    //prep_vertex(); // Initialize vertex values
 
     //RENDER LOOP
     while (!glfwWindowShouldClose(window))
@@ -43,11 +44,18 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw our first triangle
-        glUseProgram(prep_vertex());
-        glBindVertexArray(vao_vertex()); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // glBindVertexArray(0); // no need to unbind it every time 
+        glUseProgram(prep_vertex(0));
+        
+        glBindVertexArray(vao_vertex(0)); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        glDrawArrays(GL_TRIANGLES, 0, 3); //Especificar ls indeces aqui
+       
+        glUseProgram(prep_vertex(1));
+
+        glBindVertexArray(vao_vertex(1)); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        glDrawArrays(GL_TRIANGLES, 0, 3); //Especificar ls indeces aqui
+
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0); // no need to unbind it every time 
 
         //check and call events to swap buffers
         glfwSwapBuffers(window);

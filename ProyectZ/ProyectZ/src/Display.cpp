@@ -12,88 +12,113 @@ using namespace std;
 
 int dis = 1;
 
-float vert[] = {
-        -0.5f, -0.5f, 0.0f, // left  
-         0.5f, -0.5f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f  // top   
-};
-float vertices[] = {
+//Using glDrawElement
+//Also change glbindbuffer
+/*
+* float vertices[] = {
+    //X, Y, Z
      0.5f,  0.5f, 0.0f,  // top right
      0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
+   - 0.5f, -0.5f, 0.0f,  // bottom left
     -0.5f,  0.5f, 0.0f   // top left 
 };
+*/
+float firstTriangle[] = {
+       -0.9f, -0.5f, 0.0f,  // left 
+       -0.0f, -0.5f, 0.0f,  // right
+       -0.45f, 0.5f, 0.0f,  // top 
+};
+float secondTriangle[] = {
+    0.0f, -0.5f, 0.0f,  // left
+    0.9f, -0.5f, 0.0f,  // right
+    0.45f, 0.5f, 0.0f   // top 
+};
+
+
 unsigned int indices[] = {  // note that we start from 0!
-    0, 1, 3,   // first triangle
+    0, 1, 3,  // first triangle
     1, 2, 3    // second triangle
+};
+
+const char* vertexShaderSource = "#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"void main()\n"
+"{\n"
+"gl_Position = vec4(aPos.x,aPos.y,aPos.z,1.0f);\n"
+"}\0";
+
+const char* fragmentShaderSource[2] = {
+    "#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"FragColor = vec4(1.0f,1.0f,0.2f,1.0f);\n"
+"}\0" ,
+
+"#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"FragColor = vec4(1.0f,0.5f,0.2f,1.0f);\n"
+"}\0"
+
 };
 
 /*
 * VERTEX INITIATION
 * return.- void with vertex and fragment shader
 */
-Display vertex_init() {
-    //First Shader
-    Display aux;
-    aux.vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "void main()\n"
-        "{\n"
-        "gl_Position = vec4(aPos.x,aPos.y,aPos.z,1.0f);\n"
-        "}\0";
-    aux.fragmentShaderSource = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main()\n"
-        "{\n"
-        "FragColor = vec4(1.0f,1.0f,0.2f,1.0f);\n"
-        "}\0";
-    return aux;
-}
+
 /*
 * VERTEX PREPARATION
 * returns.- shaderprogram() GL_PROGRAM
 */
-int  prep_vertex() {
+int  prep_vertex(int frag_i) {
 
     //Brings vexrtex and shader from Display
-    Display d1 = vertex_init();
 
-    int vertexShader = vertex_program(d1);  //Vertex Shader Program
-    
-    int fragmentShader = fragment_program(d1); //Fragment shader program
+    int vertexShader = vertex_program(vertexShaderSource);  //Vertex Shader Program
+    const char* frag_aux = fragmentShaderSource[frag_i];
+    int fragmentShader = fragment_program(frag_aux); //Fragment shader program
+
 
     int shaderProgram = link_program(vertexShader, fragmentShader); //Linking Program
 
     return shaderProgram;
 }
 
-int vao_vertex() {
+int vao_vertex(int vaoi) {
 
-    unsigned int VBO, VAO, EBO;      //CREAMOS OBJETO PARA DIBUJAR
+    unsigned int VBO[2], VAO[2], EBO;      //CREAMOS OBJETO PARA DIBUJAR
                                 //VAO= Vertex Array Object
                                 //VBO= Vertex Buffer Object
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    glGenVertexArrays(2, VAO);
+    glGenBuffers(2, VBO);
+    //glGenBuffers(1, &EBO);
 
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-
-    // 0. copy our vertices array in a buffer for OpenGL to use
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);                                 //Bind buffer
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);  //Set buffer as Static_Draw
-    //
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    // 1. then set the vertex attributes pointers
+    //FIRST TRIANGLE
+    glBindVertexArray(VAO[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);                                 //Bind buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);  //Set buffer as Static_Draw
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);   //Pointer to the position of vertex (location=0)
     glEnableVertexAttribArray(0);
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    
+    //SECOND TRIANGLE
+    glBindVertexArray(VAO[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);                                 //Bind buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);  //Set buffer as Static_Draw
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);   //Pointer to the position of vertex (location=0)
+    glEnableVertexAttribArray(0);
+
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindVertexArray(0);
     // 2. use our shader program when we want to render an object
     //glUseProgram(shaderProgram);  --> see render loop
-    return VAO;
+    return VAO[vaoi];
 }
 
 /*
@@ -101,11 +126,11 @@ int vao_vertex() {
 * gets.- Display.vertexShaderSource
 * returns.- vertexShader GL_VERTEX_SHADER
 */
-int vertex_program(Display d) {
+int vertex_program(const char* vertexShaderSource) {
     //BUILD AND COMPILE VERTEX PROGRAM
     unsigned int vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);            //create vertex
-    glShaderSource(vertexShader, 1, &d.vertexShaderSource, NULL); //attach vertex source
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); //attach vertex source
     glCompileShader(vertexShader);                              //compile vertex
     // check for shader compile errors
     int success;
@@ -123,10 +148,10 @@ int vertex_program(Display d) {
 * gets.- Display.fragmentShaderSource
 * returns.- vertexShader GL_VERTEX_SHADER
 */
-int fragment_program(Display d) {
+int fragment_program(const char* fragmentShaderSource) {
     //BUILD AND COMPILE FRAGMENT SHADER PROGRAM
     int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);        //create fragment
-    glShaderSource(fragmentShader, 1, &d.fragmentShaderSource, NULL); //attach fragment
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL); //attach fragment
     glCompileShader(fragmentShader);                                //compile fragment
     // check for shader compile errors
     int success;
